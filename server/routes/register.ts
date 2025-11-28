@@ -157,29 +157,40 @@ export const handleRegister: RequestHandler = async (req, res) => {
         const txt = await resp.text().catch(() => "");
         // Detect PostgREST missing table error and fallback to users
         if ((txt && txt.includes("Could not find the table 'public.app_users'")) || txt.includes('PGRST205')) {
-          // Try inserting into users with the original payload first
-          resp = await doPostWithBody(urlB, userPayload);
+          // Try inserting into users, removing problematic columns if needed
+          let currentPayload = { ...userPayload };
+          let attempts = 0;
+          const maxAttempts = 10;
 
-          if (!resp.ok) {
+          while (attempts < maxAttempts) {
+            resp = await doPostWithBody(urlB, currentPayload);
+            if (resp.ok) {
+              return resp;
+            }
+
             const txt2 = await resp.text().catch(() => "");
 
-            // Try to detect missing column error and retry without that column
+            // Try to detect missing column error and remove it
             // Patterns: "Could not find the column 'address'" or 'column "address" does not exist'
-            const m = txt2.match(/Could not find the column '([^']+)'/) || txt2.match(/column "([^"]+)" does not exist/);
+            const m = txt2.match(/Could not find the column '([^']+)'/) ||
+                      txt2.match(/column "([^"]+)" does not exist/) ||
+                      txt2.match(/Unexpected key in JSON: '([^']+)'/) ||
+                      txt2.match(/Unexpected key in JSON: "([^"]+)"/);
+
             if (m && m[1]) {
               const col = m[1];
-              if (col in userPayload) {
-                const filtered = { ...userPayload };
-                delete filtered[col as keyof typeof filtered];
-                // Retry once with filtered payload
-                const retryResp = await doPostWithBody(urlB, filtered);
-                return retryResp;
+              if (col in currentPayload) {
+                delete currentPayload[col];
+                attempts++;
+                continue;
               }
             }
 
-            // If we couldn't handle the error specially, return the response we got from users
+            // If we couldn't handle the error, return what we got
             return resp;
           }
+
+          return resp;
         } else {
           // For other errors when inserting into app_users, return original response
           return resp;
