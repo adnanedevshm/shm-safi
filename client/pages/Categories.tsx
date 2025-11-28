@@ -19,7 +19,9 @@ export default function Categories() {
       <section className="mx-auto max-w-lg">
         <div className="rounded-2xl bg-white/70 shadow-sm ring-1 ring-black/5 p-6 md:p-8">
           <h2 className="text-xl font-semibold text-center mb-1">عضو</h2>
-          <p className="text-center text-slate-600 mb-6">Sélectionnez votre catégorie pour accéder à votre espace personnel</p>
+          <p className="text-center text-slate-600 mb-6">
+            Sélectionnez votre catégorie pour accéder à votre espace personnel
+          </p>
 
           <div className="space-y-4">
             {groups.map((g) => (
@@ -28,10 +30,14 @@ export default function Categories() {
                 to={{ pathname: "/connexion", search: `?category=${g.label}` }}
                 className="block rounded-lg overflow-hidden bg-white ring-1 ring-black/5 hover:shadow-md transition-shadow"
               >
-                <div className={`${g.color} p-4 text-center text-lg`}>{g.title}</div>
+                <div className={`${g.color} p-4 text-center text-lg`}>
+                  {g.title}
+                </div>
                 <div className="flex items-center justify-between p-3">
                   <div className="text-sm text-slate-600">{g.label}</div>
-                  <div className="text-sm text-slate-400">Catégorie {g.label}</div>
+                  <div className="text-sm text-slate-400">
+                    Catégorie {g.label}
+                  </div>
                 </div>
               </Link>
             ))}
