@@ -165,6 +165,7 @@ export default function Register() {
         cin: (draft as any).cin || null,
         phone: draft.phone || null,
         address: draft.address || null,
+        niche_id: draft.niche_id || null,
       };
 
       // include tutor information if provided
