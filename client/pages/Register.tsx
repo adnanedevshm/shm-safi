@@ -12,6 +12,7 @@ type Draft = {
   cin?: string;
   phone?: string;
   address?: string;
+  niche_id?: string;
 };
 
 function generateRandomNumber() {
@@ -31,6 +32,7 @@ function generateId(prefix?: string) {
 
 export default function Register() {
   const [step, setStep] = useState(1);
+  const [niches, setNiches] = useState<any[]>([]);
   const [draft, setDraft] = useState<Draft>(() => {
     let id = generateId();
     try {
@@ -42,15 +44,31 @@ export default function Register() {
         }
       }
     } catch (e) {}
-    return { id, prenom: "", nom: "", password: "", dob: "", cin: "" };
+    return { id, prenom: "", nom: "", password: "", dob: "", cin: "", niche_id: "" };
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Fetch niches on mount
+  useEffect(() => {
+    const fetchNiches = async () => {
+      try {
+        const base = (import.meta as any).env?.VITE_API_BASE || window.location.origin;
+        const resp = await fetch(`${base.replace(/\/$/, '')}/api/niches`);
+        if (resp.ok) {
+          const data = await resp.json();
+          setNiches(Array.isArray(data) ? data : data.niches || []);
+        }
+      } catch (err) {
+        console.warn("Failed to fetch niches:", err);
+      }
+    };
+    fetchNiches();
+  }, []);
 
   const update = (patch: Partial<Draft>) => setDraft((d) => ({ ...d, ...patch }));
 
-  const maxStep = 3; // three steps: compte, perso, tuteur
+  const maxStep = 4; // four steps: compte, perso, niche, tuteur
 
   function isValidDobRange(dob?: string, minYear?: number, maxYear?: number) {
     if (!dob) return false;
