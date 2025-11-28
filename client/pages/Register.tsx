@@ -290,6 +290,22 @@ export default function Register() {
 
           {step === 3 && (
             <div>
+              <h3 className="font-semibold text-lg mb-3">Sélectionner une niche</h3>
+              <div className="grid gap-2">
+                <select value={draft.niche_id || ""} className="h-11 rounded-md border border-slate-200 bg-white px-3" onChange={(e) => update({ niche_id: e.target.value })}>
+                  <option value="">-- Choisir une niche --</option>
+                  {niches.map((niche: any) => (
+                    <option key={niche.id} value={niche.id}>
+                      {niche.name || niche.id}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+
+          {step === 4 && (
+            <div>
               <h3 className="font-semibold text-lg mb-3">Informations du tuteur (si applicable)</h3>
               <div className="grid gap-2">
                 <div className="grid grid-cols-2 gap-2">
