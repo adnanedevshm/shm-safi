@@ -40,10 +40,10 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/connexion" element={<Login />} />
+          <Route path="/connexion" element={<Register />} />
           <Route path="/register" element={<Register />} />
           <Route path="/register-chef" element={<RegisterChef />} />
-          <Route path="/creer-un-compte" element={<Register />} />
+          <Route path="/creer-un-compte" element={<Login />} />
           <Route path="/creer-un-chef" element={<RegisterChef />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/reset-password" element={<ResetPassword />} />

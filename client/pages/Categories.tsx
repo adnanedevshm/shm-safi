@@ -25,7 +25,7 @@ export default function Categories() {
             {groups.map((g) => (
               <Link
                 key={g.label}
-                to={{ pathname: "/creer-un-compte", search: `?category=${g.label}` }}
+                to={{ pathname: "/connexion", search: `?category=${g.label}` }}
                 className="block rounded-lg overflow-hidden bg-white ring-1 ring-black/5 hover:shadow-md transition-shadow"
               >
                 <div className={`${g.color} p-4 text-center text-lg`}>{g.title}</div>
