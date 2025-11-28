@@ -262,34 +262,6 @@ export default function Compte() {
           <div className="rounded-lg bg-white p-6 shadow">
             <h2 className="text-lg font-semibold mb-4 flex items-center justify-between">
               Détails du compte
-              <div>
-                {!editingBasic ? (
-                  <button
-                    onClick={() => setEditingBasic(true)}
-                    className="text-sm text-violet-600"
-                  >
-                    ✏️ Modifier
-                  </button>
-                ) : (
-                  <>
-                    <button
-                      onClick={saveBasic}
-                      className="text-sm text-white bg-violet-600 px-3 py-1 rounded"
-                    >
-                      Enregistrer
-                    </button>
-                    <button
-                      onClick={() => {
-                        setEditingBasic(false);
-                        setForm({ ...form });
-                      }}
-                      className="ml-2 text-sm"
-                    >
-                      Annuler
-                    </button>
-                  </>
-                )}
-              </div>
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -380,29 +352,6 @@ export default function Compte() {
                 <div>
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm text-slate-500">Tuteur</h3>
-                    {!editingTutor ? (
-                      <button
-                        onClick={() => setEditingTutor(true)}
-                        className="text-sm text-violet-600"
-                      >
-                        ✏️ Modifier le tuteur
-                      </button>
-                    ) : (
-                      <>
-                        <button
-                          onClick={saveTutor}
-                          className="text-sm text-white bg-violet-600 px-3 py-1 rounded"
-                        >
-                          Enregistrer
-                        </button>
-                        <button
-                          onClick={() => setEditingTutor(false)}
-                          className="ml-2 text-sm"
-                        >
-                          Annuler
-                        </button>
-                      </>
-                    )}
                   </div>
 
                   <div className="mt-2">
