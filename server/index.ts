@@ -5,6 +5,7 @@ import { handleDemo } from "./routes/demo";
 import { handleRegister } from "./routes/register";
 import { handleDebug } from "./routes/debug";
 import { handleLogin } from "./routes/login";
+import { handleNiches } from "./routes/niches";
 
 export function createServer() {
   const app = express();
@@ -24,6 +25,7 @@ export function createServer() {
   app.post("/api/register", handleRegister);
   app.get("/api/debug/supabase", handleDebug);
   app.post("/api/login", handleLogin);
+  app.get("/api/niches", handleNiches);
   app.get("/api/user", (req, res, next) => {
     const { handleUser } = require("./routes/user");
     return handleUser(req, res, next);
