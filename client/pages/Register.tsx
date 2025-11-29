@@ -13,6 +13,7 @@ type Draft = {
   phone?: string;
   address?: string;
   niche_id?: string;
+  role?: string;
 };
 
 function generateRandomNumber() {
@@ -44,7 +45,7 @@ export default function Register() {
         }
       }
     } catch (e) {}
-    return { id, prenom: "", nom: "", password: "", dob: "", cin: "", niche_id: "" };
+    return { id, prenom: "", nom: "", password: "", dob: "", cin: "", niche_id: "", role: "" };
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -166,6 +167,7 @@ export default function Register() {
         phone: draft.phone || null,
         address: draft.address || null,
         niche_id: draft.niche_id || null,
+        role: draft.role || null,
       };
 
       // include tutor information if provided
