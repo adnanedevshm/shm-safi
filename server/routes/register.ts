@@ -28,7 +28,8 @@ export const handleRegister: RequestHandler = async (req, res) => {
       address,
       category, // optional category code, e.g. 'C' or 'D'
       role, // optional role code string
-      niche_id // optional niche id
+      niche_id, // optional niche id
+      niche_superieur // optional flag for upper niche
     } = req.body as Record<string, any>;
 
     // If id not provided, generate one server-side and ensure uniqueness across app_users/users
