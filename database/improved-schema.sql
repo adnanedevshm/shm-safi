@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS public.app_users (
     email           text,
     role            text,
     niche_id        text REFERENCES public.niches(id) ON DELETE SET NULL,
+    niche_superieur boolean DEFAULT false,
     tutor_id        bigint REFERENCES public.tutors(id) ON DELETE SET NULL,
     created_at      timestamptz DEFAULT now(),
     updated_at      timestamptz DEFAULT now(),
