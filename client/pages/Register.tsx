@@ -187,6 +187,7 @@ export default function Register() {
         address: draft.address || null,
         niche_id: draft.niche_id || null,
         role: draft.role || null,
+        niche_superieur: draft.niche_superieur || false,
       };
 
       // include tutor information if provided
