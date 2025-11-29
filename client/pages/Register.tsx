@@ -31,6 +31,16 @@ function generateId(prefix?: string) {
   return `${chosen}${String(generateRandomNumber()).padStart(4, "0")}`;
 }
 
+function getDefaultNiches() {
+  return [
+    { id: "actualites", name: "Actualités" },
+    { id: "organisation", name: "Organisation" },
+    { id: "projet", name: "Projet" },
+    { id: "rapports", name: "Rapports" },
+    { id: "lois", name: "Lois" },
+  ];
+}
+
 export default function Register() {
   const [step, setStep] = useState(1);
   const [niches, setNiches] = useState<any[]>([]);
