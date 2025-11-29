@@ -105,7 +105,7 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
 
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <NavLink to="/audio-tracks" className="flex items-center justify-between w-full">
+                  <NavLink to="/audio-tracks" className={({ isActive }) => `flex items-center justify-between w-full ${isActive ? 'bg-white/20' : ''}`}>
                     <span className="flex items-center gap-3 justify-end"><Play /> <span>Firqa Nohassia</span></span>
                   </NavLink>
                 </SidebarMenuButton>
@@ -113,7 +113,7 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
 
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <NavLink to="/rapports" className="flex items-center justify-between w-full">
+                  <NavLink to="/rapports" className={({ isActive }) => `flex items-center justify-between w-full ${isActive ? 'bg-white/20' : ''}`}>
                     <span className="flex items-center gap-3 justify-end"><FileText /> <span>Rapports de Séance</span></span>
                   </NavLink>
                 </SidebarMenuButton>
@@ -129,7 +129,7 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
 
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <NavLink to="/idees" className="flex items-center justify-between w-full">
+                  <NavLink to="/idees" className={({ isActive }) => `flex items-center justify-between w-full ${isActive ? 'bg-white/20' : ''}`}>
                     <span className="flex items-center gap-3 justify-end"><Lightbulb /> <span>صندوق الأفكار</span></span>
                   </NavLink>
                 </SidebarMenuButton>
