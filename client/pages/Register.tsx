@@ -56,7 +56,7 @@ export default function Register() {
         }
       }
     } catch (e) {}
-    return { id, prenom: "", nom: "", password: "", dob: "", cin: "", niche_id: "", role: "" };
+    return { id, prenom: "", nom: "", password: "", dob: "", cin: "", niche_id: "", role: "", niche_superieur: false };
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
