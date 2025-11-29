@@ -312,23 +312,43 @@ export default function Register() {
           {step === 3 && (
             <div>
               <h3 className="font-semibold text-lg mb-3">Sélectionner une niche et un rôle</h3>
-              <div className="grid gap-2">
-                <select value={draft.niche_id || ""} className="h-11 rounded-md border border-slate-200 bg-white px-3" onChange={(e) => update({ niche_id: e.target.value, role: "" })}>
-                  <option value="">-- Choisir une niche --</option>
-                  {niches.map((niche: any) => (
-                    <option key={niche.id} value={niche.id}>
-                      {niche.name || niche.id}
-                    </option>
-                  ))}
-                </select>
-                {draft.niche_id && (
-                  <select value={draft.role || ""} className="h-11 rounded-md border border-slate-200 bg-white px-3" onChange={(e) => update({ role: e.target.value })}>
-                    <option value="">-- Choisir un rôle --</option>
-                    <option value="membre">Membre</option>
-                    <option value="chef_niche">Chef de Niche</option>
-                    <option value="sous_chef">Sous-Chef</option>
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium text-slate-700">Niche</label>
+                  <select value={draft.niche_id || ""} className="h-11 rounded-md border border-slate-200 bg-white px-3" onChange={(e) => update({ niche_id: e.target.value, role: "" })}>
+                    <option value="">-- Choisir une niche --</option>
+                    {niches.map((niche: any) => (
+                      <option key={niche.id} value={niche.id}>
+                        {niche.name || niche.id}
+                      </option>
+                    ))}
                   </select>
+                </div>
+
+                {draft.niche_id && (
+                  <div className="grid gap-2">
+                    <label className="text-sm font-medium text-slate-700">Rôle</label>
+                    <select value={draft.role || ""} className="h-11 rounded-md border border-slate-200 bg-white px-3" onChange={(e) => update({ role: e.target.value })}>
+                      <option value="">-- Choisir un rôle --</option>
+                      <option value="membre">Membre</option>
+                      <option value="chef_niche">Chef de Niche</option>
+                      <option value="sous_chef">Sous-Chef</option>
+                    </select>
+                  </div>
                 )}
+
+                <div className="flex items-center gap-3 p-3 rounded-md border border-slate-200 bg-slate-50">
+                  <input
+                    type="checkbox"
+                    id="niche_superieur"
+                    checked={draft.niche_superieur || false}
+                    onChange={(e) => update({ niche_superieur: e.target.checked })}
+                    className="w-4 h-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500"
+                  />
+                  <label htmlFor="niche_superieur" className="text-sm text-slate-700 cursor-pointer">
+                    Niche supérieur (facultatif)
+                  </label>
+                </div>
               </div>
             </div>
           )}
