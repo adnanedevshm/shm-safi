@@ -58,10 +58,16 @@ export default function Register() {
         const resp = await fetch(`${base.replace(/\/$/, '')}/api/niches`);
         if (resp.ok) {
           const data = await resp.json();
-          setNiches(Array.isArray(data) ? data : data.niches || []);
+          const niches_list = Array.isArray(data) ? data : data.niches || [];
+          console.log("Niches loaded:", niches_list);
+          setNiches(niches_list.length > 0 ? niches_list : getDefaultNiches());
+        } else {
+          console.warn("Failed to fetch niches, using defaults");
+          setNiches(getDefaultNiches());
         }
       } catch (err) {
         console.warn("Failed to fetch niches:", err);
+        setNiches(getDefaultNiches());
       }
     };
     fetchNiches();
