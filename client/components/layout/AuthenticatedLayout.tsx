@@ -73,7 +73,7 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <NavLink to="/compte" className="flex items-center justify-between w-full">
+                  <NavLink to="/compte" className={({ isActive }) => `flex items-center justify-between w-full ${isActive ? 'bg-white/20' : ''}`}>
                     <span className="flex items-center gap-3 justify-end"><UserIcon /> <span>Mon Espace Compte</span></span>
                   </NavLink>
                 </SidebarMenuButton>
@@ -81,7 +81,7 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
 
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <NavLink to="/programme" className="flex items-center justify-between w-full">
+                  <NavLink to="/programme" className={({ isActive }) => `flex items-center justify-between w-full ${isActive ? 'bg-white/20' : ''}`}>
                     <span className="flex items-center gap-3 justify-end"><Calendar /> <span>Programme</span></span>
                   </NavLink>
                 </SidebarMenuButton>
@@ -89,7 +89,7 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
 
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <NavLink to="/anachid" className="flex items-center justify-between w-full">
+                  <NavLink to="/anachid" className={({ isActive }) => `flex items-center justify-between w-full ${isActive ? 'bg-white/20' : ''}`}>
                     <span className="flex items-center gap-3 justify-end"><Music /> <span>Anachid</span></span>
                   </NavLink>
                 </SidebarMenuButton>
@@ -97,7 +97,7 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
 
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <NavLink to="/frida" className="flex items-center justify-between w-full">
+                  <NavLink to="/frida" className={({ isActive }) => `flex items-center justify-between w-full ${isActive ? 'bg-white/20' : ''}`}>
                     <span className="flex items-center gap-3 justify-end"><Book /> <span>Founoun Arriyada</span></span>
                   </NavLink>
                 </SidebarMenuButton>
