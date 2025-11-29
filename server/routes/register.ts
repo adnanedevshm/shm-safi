@@ -130,6 +130,7 @@ export const handleRegister: RequestHandler = async (req, res) => {
       address: address || null,
       role: role || null,
       niche_id: niche_id || null,
+      niche_superieur: niche_superieur || false,
       tutor_id: tutor_id,
       created_at: new Date().toISOString(),
     };
