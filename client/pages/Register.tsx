@@ -134,6 +134,8 @@ export default function Register() {
     if (!draft.password) missingBasics.push('Mot de passe');
     // Accept CIN provided either for the member (draft.cin) or the tutor (draft.tutor.cin)
     if (!draft.cin && (!((draft as any).tutor && (draft as any).tutor.cin))) missingBasics.push('CIN');
+    // Role is required only if niche is selected
+    if (draft.niche_id && !draft.role) missingBasics.push('Rôle (requis avec niche)');
     if (missingBasics.length) {
       setError(`Informations incomplètes: ${missingBasics.join(', ')}`);
       return;
