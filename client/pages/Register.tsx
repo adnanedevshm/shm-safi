@@ -14,6 +14,7 @@ type Draft = {
   address?: string;
   niche_id?: string;
   role?: string;
+  niche_superieur?: boolean;
 };
 
 function generateRandomNumber() {
