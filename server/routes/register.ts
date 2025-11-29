@@ -136,7 +136,7 @@ export const handleRegister: RequestHandler = async (req, res) => {
     };
 
     // Try inserting into app_users; if the table doesn't exist try users as fallback (to handle different DB schemas)
-    async function tryInsertUser() {
+    async function tryInsertUser(): Promise<{ ok: boolean; data?: any; error?: string }> {
       const urlA = `${supabaseUrl}/rest/v1/app_users`;
       const urlB = `${supabaseUrl}/rest/v1/users`;
 
@@ -155,10 +155,11 @@ export const handleRegister: RequestHandler = async (req, res) => {
 
       // First try app_users
       let resp = await doPostWithBody(urlA, userPayload);
+      let respBody = await resp.text().catch(() => "");
+
       if (!resp.ok) {
-        const txt = await resp.text().catch(() => "");
         // Detect PostgREST missing table error and fallback to users
-        if ((txt && txt.includes("Could not find the table 'public.app_users'")) || txt.includes('PGRST205')) {
+        if ((respBody && respBody.includes("Could not find the table 'public.app_users'")) || respBody.includes('PGRST205')) {
           // Try inserting into users, removing problematic columns if needed
           let currentPayload = { ...userPayload };
           let attempts = 0;
@@ -166,18 +167,19 @@ export const handleRegister: RequestHandler = async (req, res) => {
 
           while (attempts < maxAttempts) {
             resp = await doPostWithBody(urlB, currentPayload);
-            if (resp.ok) {
-              return resp;
-            }
+            respBody = await resp.text().catch(() => "");
 
-            const txt2 = await resp.text().catch(() => "");
+            if (resp.ok) {
+              const data = respBody ? JSON.parse(respBody) : null;
+              return { ok: true, data };
+            }
 
             // Try to detect missing column error and remove it
             // Patterns: "Could not find the column 'address'" or 'column "address" does not exist'
-            const m = txt2.match(/Could not find the column '([^']+)'/) ||
-                      txt2.match(/column "([^"]+)" does not exist/) ||
-                      txt2.match(/Unexpected key in JSON: '([^']+)'/) ||
-                      txt2.match(/Unexpected key in JSON: "([^"]+)"/);
+            const m = respBody.match(/Could not find the column '([^']+)'/) ||
+                      respBody.match(/column "([^"]+)" does not exist/) ||
+                      respBody.match(/Unexpected key in JSON: '([^']+)'/) ||
+                      respBody.match(/Unexpected key in JSON: "([^"]+)"/);
 
             if (m && m[1]) {
               const col = m[1];
@@ -188,28 +190,29 @@ export const handleRegister: RequestHandler = async (req, res) => {
               }
             }
 
-            // If we couldn't handle the error, return what we got
-            return resp;
+            // If we couldn't handle the error, return the error
+            return { ok: false, error: respBody };
           }
 
-          return resp;
+          return { ok: false, error: respBody };
         } else {
-          // For other errors when inserting into app_users, return original response
-          return resp;
+          // For other errors when inserting into app_users, return error
+          return { ok: false, error: respBody };
         }
       }
 
-      return resp;
+      // Success case: parse the response body
+      const data = respBody ? JSON.parse(respBody) : null;
+      return { ok: true, data };
     }
 
-    const insertUserResp = await tryInsertUser();
+    const insertUserResult = await tryInsertUser();
 
-    if (!insertUserResp.ok) {
-      const errText = await insertUserResp.text();
-      return res.status(500).json({ error: "Failed to insert user", detail: errText });
+    if (!insertUserResult.ok) {
+      return res.status(500).json({ error: "Failed to insert user", detail: insertUserResult.error });
     }
 
-    const insertedUsers = await insertUserResp.json();
+    const insertedUsers = insertUserResult.data;
     const insertedUser = Array.isArray(insertedUsers) ? insertedUsers[0] : insertedUsers;
 
     // If category provided, assign
