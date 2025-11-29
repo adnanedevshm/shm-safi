@@ -294,9 +294,9 @@ export default function Register() {
 
           {step === 3 && (
             <div>
-              <h3 className="font-semibold text-lg mb-3">Sélectionner une niche</h3>
+              <h3 className="font-semibold text-lg mb-3">Sélectionner une niche et un rôle</h3>
               <div className="grid gap-2">
-                <select value={draft.niche_id || ""} className="h-11 rounded-md border border-slate-200 bg-white px-3" onChange={(e) => update({ niche_id: e.target.value })}>
+                <select value={draft.niche_id || ""} className="h-11 rounded-md border border-slate-200 bg-white px-3" onChange={(e) => update({ niche_id: e.target.value, role: "" })}>
                   <option value="">-- Choisir une niche --</option>
                   {niches.map((niche: any) => (
                     <option key={niche.id} value={niche.id}>
@@ -304,6 +304,14 @@ export default function Register() {
                     </option>
                   ))}
                 </select>
+                {draft.niche_id && (
+                  <select value={draft.role || ""} className="h-11 rounded-md border border-slate-200 bg-white px-3" onChange={(e) => update({ role: e.target.value })}>
+                    <option value="">-- Choisir un rôle --</option>
+                    <option value="membre">Membre</option>
+                    <option value="chef_niche">Chef de Niche</option>
+                    <option value="sous_chef">Sous-Chef</option>
+                  </select>
+                )}
               </div>
             </div>
           )}
