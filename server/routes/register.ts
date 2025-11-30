@@ -28,7 +28,8 @@ export const handleRegister: RequestHandler = async (req, res) => {
       address,
       category, // optional category code, e.g. 'C' or 'D'
       role, // optional role code string
-      niche_id // optional niche id
+      niche_id, // optional niche id
+      niche_superieur // optional flag for upper niche
     } = req.body as Record<string, any>;
 
     // If id not provided, generate one server-side and ensure uniqueness across app_users/users
@@ -129,12 +130,13 @@ export const handleRegister: RequestHandler = async (req, res) => {
       address: address || null,
       role: role || null,
       niche_id: niche_id || null,
+      niche_superieur: niche_superieur || false,
       tutor_id: tutor_id,
       created_at: new Date().toISOString(),
     };
 
     // Try inserting into app_users; if the table doesn't exist try users as fallback (to handle different DB schemas)
-    async function tryInsertUser() {
+    async function tryInsertUser(): Promise<{ ok: boolean; data?: any; error?: string }> {
       const urlA = `${supabaseUrl}/rest/v1/app_users`;
       const urlB = `${supabaseUrl}/rest/v1/users`;
 
@@ -153,50 +155,64 @@ export const handleRegister: RequestHandler = async (req, res) => {
 
       // First try app_users
       let resp = await doPostWithBody(urlA, userPayload);
+      let respBody = await resp.text().catch(() => "");
+
       if (!resp.ok) {
-        const txt = await resp.text().catch(() => "");
         // Detect PostgREST missing table error and fallback to users
-        if ((txt && txt.includes("Could not find the table 'public.app_users'")) || txt.includes('PGRST205')) {
-          // Try inserting into users with the original payload first
-          resp = await doPostWithBody(urlB, userPayload);
+        if ((respBody && respBody.includes("Could not find the table 'public.app_users'")) || respBody.includes('PGRST205')) {
+          // Try inserting into users, removing problematic columns if needed
+          let currentPayload = { ...userPayload };
+          let attempts = 0;
+          const maxAttempts = 10;
 
-          if (!resp.ok) {
-            const txt2 = await resp.text().catch(() => "");
+          while (attempts < maxAttempts) {
+            resp = await doPostWithBody(urlB, currentPayload);
+            respBody = await resp.text().catch(() => "");
 
-            // Try to detect missing column error and retry without that column
+            if (resp.ok) {
+              const data = respBody ? JSON.parse(respBody) : null;
+              return { ok: true, data };
+            }
+
+            // Try to detect missing column error and remove it
             // Patterns: "Could not find the column 'address'" or 'column "address" does not exist'
-            const m = txt2.match(/Could not find the column '([^']+)'/) || txt2.match(/column "([^"]+)" does not exist/);
+            const m = respBody.match(/Could not find the column '([^']+)'/) ||
+                      respBody.match(/column "([^"]+)" does not exist/) ||
+                      respBody.match(/Unexpected key in JSON: '([^']+)'/) ||
+                      respBody.match(/Unexpected key in JSON: "([^"]+)"/);
+
             if (m && m[1]) {
               const col = m[1];
-              if (col in userPayload) {
-                const filtered = { ...userPayload };
-                delete filtered[col as keyof typeof filtered];
-                // Retry once with filtered payload
-                const retryResp = await doPostWithBody(urlB, filtered);
-                return retryResp;
+              if (col in currentPayload) {
+                delete currentPayload[col];
+                attempts++;
+                continue;
               }
             }
 
-            // If we couldn't handle the error specially, return the response we got from users
-            return resp;
+            // If we couldn't handle the error, return the error
+            return { ok: false, error: respBody };
           }
+
+          return { ok: false, error: respBody };
         } else {
-          // For other errors when inserting into app_users, return original response
-          return resp;
+          // For other errors when inserting into app_users, return error
+          return { ok: false, error: respBody };
         }
       }
 
-      return resp;
+      // Success case: parse the response body
+      const data = respBody ? JSON.parse(respBody) : null;
+      return { ok: true, data };
     }
 
-    const insertUserResp = await tryInsertUser();
+    const insertUserResult = await tryInsertUser();
 
-    if (!insertUserResp.ok) {
-      const errText = await insertUserResp.text();
-      return res.status(500).json({ error: "Failed to insert user", detail: errText });
+    if (!insertUserResult.ok) {
+      return res.status(500).json({ error: "Failed to insert user", detail: insertUserResult.error });
     }
 
-    const insertedUsers = await insertUserResp.json();
+    const insertedUsers = insertUserResult.data;
     const insertedUser = Array.isArray(insertedUsers) ? insertedUsers[0] : insertedUsers;
 
     // If category provided, assign

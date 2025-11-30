@@ -12,6 +12,9 @@ type Draft = {
   cin?: string;
   phone?: string;
   address?: string;
+  niche_id?: string;
+  role?: string;
+  niche_superieur?: boolean;
 };
 
 function generateRandomNumber() {
@@ -29,8 +32,19 @@ function generateId(prefix?: string) {
   return `${chosen}${String(generateRandomNumber()).padStart(4, "0")}`;
 }
 
+function getDefaultNiches() {
+  return [
+    { id: "actualites", name: "Actualités" },
+    { id: "organisation", name: "Organisation" },
+    { id: "projet", name: "Projet" },
+    { id: "rapports", name: "Rapports" },
+    { id: "lois", name: "Lois" },
+  ];
+}
+
 export default function Register() {
   const [step, setStep] = useState(1);
+  const [niches, setNiches] = useState<any[]>([]);
   const [draft, setDraft] = useState<Draft>(() => {
     let id = generateId();
     try {
@@ -42,15 +56,37 @@ export default function Register() {
         }
       }
     } catch (e) {}
-    return { id, prenom: "", nom: "", password: "", dob: "", cin: "" };
+    return { id, prenom: "", nom: "", password: "", dob: "", cin: "", niche_id: "", role: "", niche_superieur: false };
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Fetch niches on mount
+  useEffect(() => {
+    const fetchNiches = async () => {
+      try {
+        const base = (import.meta as any).env?.VITE_API_BASE || window.location.origin;
+        const resp = await fetch(`${base.replace(/\/$/, '')}/api/niches`);
+        if (resp.ok) {
+          const data = await resp.json();
+          const niches_list = Array.isArray(data) ? data : data.niches || [];
+          console.log("Niches loaded:", niches_list);
+          setNiches(niches_list.length > 0 ? niches_list : getDefaultNiches());
+        } else {
+          console.warn("Failed to fetch niches, using defaults");
+          setNiches(getDefaultNiches());
+        }
+      } catch (err) {
+        console.warn("Failed to fetch niches:", err);
+        setNiches(getDefaultNiches());
+      }
+    };
+    fetchNiches();
+  }, []);
 
   const update = (patch: Partial<Draft>) => setDraft((d) => ({ ...d, ...patch }));
 
-  const maxStep = 3; // three steps: compte, perso, tuteur
+  const maxStep = 4; // four steps: compte, perso, niche, tuteur
 
   function isValidDobRange(dob?: string, minYear?: number, maxYear?: number) {
     if (!dob) return false;
@@ -115,6 +151,8 @@ export default function Register() {
     if (!draft.password) missingBasics.push('Mot de passe');
     // Accept CIN provided either for the member (draft.cin) or the tutor (draft.tutor.cin)
     if (!draft.cin && (!((draft as any).tutor && (draft as any).tutor.cin))) missingBasics.push('CIN');
+    // Role is required only if niche is selected
+    if (draft.niche_id && !draft.role) missingBasics.push('Rôle (requis avec niche)');
     if (missingBasics.length) {
       setError(`Informations incomplètes: ${missingBasics.join(', ')}`);
       return;
@@ -147,6 +185,9 @@ export default function Register() {
         cin: (draft as any).cin || null,
         phone: draft.phone || null,
         address: draft.address || null,
+        niche_id: draft.niche_id || null,
+        role: draft.role || null,
+        niche_superieur: draft.niche_superieur || false,
       };
 
       // include tutor information if provided
@@ -270,6 +311,48 @@ export default function Register() {
           )}
 
           {step === 3 && (
+            <div>
+              <h3 className="font-semibold text-lg mb-3">Sélectionner une niche et un rôle</h3>
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium text-slate-700">Niche</label>
+                  <select value={draft.niche_id || ""} className="h-11 rounded-md border border-slate-200 bg-white px-3" onChange={(e) => update({ niche_id: e.target.value })}>
+                    <option value="">-- Choisir une niche --</option>
+                    {niches.map((niche: any) => (
+                      <option key={niche.id} value={niche.id}>
+                        {niche.name || niche.id}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium text-slate-700">Rôle</label>
+                  <select value={draft.role || ""} className="h-11 rounded-md border border-slate-200 bg-white px-3" onChange={(e) => update({ role: e.target.value })}>
+                    <option value="">-- Choisir un rôle --</option>
+                    <option value="membre">Membre</option>
+                    <option value="chef_niche">Chef de Niche</option>
+                    <option value="sous_chef">Sous-Chef</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 rounded-md border border-slate-200 bg-slate-50">
+                  <input
+                    type="checkbox"
+                    id="niche_superieur"
+                    checked={draft.niche_superieur || false}
+                    onChange={(e) => update({ niche_superieur: e.target.checked })}
+                    className="w-4 h-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500"
+                  />
+                  <label htmlFor="niche_superieur" className="text-sm text-slate-700 cursor-pointer">
+                    Niche supérieur (facultatif)
+                  </label>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {step === 4 && (
             <div>
               <h3 className="font-semibold text-lg mb-3">Informations du tuteur (si applicable)</h3>
               <div className="grid gap-2">
